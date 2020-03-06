@@ -1,0 +1,18 @@
+name: 'Preview Deploy on Storefrontcloud.io'
+description: 'Deploy your PR changes on Storefrontcloud!'
+branding:
+  icon: 'upload-cloud'
+  color: 'blue'
+inputs:
+  token:
+    description: 'Github API token'
+    required: true
+  namespace:
+    description: 'Project namespace on Storefrontcloud'
+    required: true
+outputs:
+  preview_url:
+    description: 'Deployed instance URL for given PR'
+runs:
+  using: 'node12'
+  main: 'index.js'

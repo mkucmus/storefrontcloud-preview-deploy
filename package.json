@@ -1,0 +1,15 @@
+{
+  "name": "storefrontcloud-preview-deploy",
+  "version": "0.0.1",
+  "description": "Preview Deploy on Storefrontcloud.io",
+  "main": "index.js",
+  "repository": "git@github.com:mkucmus/storefrontcloud-preview-deploy.git",
+  "author": "Maciej Kucmus <maciejkucmus@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@actions/core": "^1.2.3",
+    "@actions/github": "^2.1.1",
+    "axios": "^0.19.2"
+  }
+}
