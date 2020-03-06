@@ -26,9 +26,9 @@ const delay = ms => new Promise(r => setTimeout(r, ms));
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
     
     await axios.get(deployUrl); // double request - temporary cloud's fix
-    await delay(3000)
+    await delay(3000) // double request - temporary cloud's fix
     const response = await client.get(deployUrl);
-    if (!response.data.includes('<html data-n-head-ssr2')) {
+    if (!response.data.includes('<html data-n-head-ssr')) {
       throw "Deploy has failed. Application returns wrong data."
     }    
     
