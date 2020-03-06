@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
+const https = require('https');
 const client = axios.create({
   httpsAgent: new https.Agent({  
     rejectUnauthorized: false
