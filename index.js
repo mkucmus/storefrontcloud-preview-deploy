@@ -20,13 +20,13 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
   const newCommentBody = `${DEPLOY_COMMENT_TEMPLATE.replace('NAMESPACE', namespace)} at ${deployUrl}`
   if (!oldComment) {
     await client.repos.createCommitComment({
-      repo,
+      ...repo,
       commit_sha: commitHash,
       body: newCommentBody
     });
   } else {
     await client.repos.updateCommitComment({
-      repo,
+      ...repo,
       comment_id: oldComment.id,
       body: newCommentBody
     });
