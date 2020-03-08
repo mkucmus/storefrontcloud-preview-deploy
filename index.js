@@ -52,13 +52,12 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     await client.get(deployUrl); // double request - temporary cloud's fix
     await delay(3000) 
     const response = await client.get(deployUrl); // double request - temporary cloud's fix
-    if (!response.data.includes('<html data-n-head-ssr')) {
+    if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
       throw "Deploy has failed. Application returns wrong data."
     }    
     
     console.log(`Your application is successfully deployed.`);
     const octokit = new github.GitHub(githubToken);
-    // TODO: handle PR comment update.
     await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace);
     core.setOutput('preview_url', deployUrl);
   } catch (error) {
