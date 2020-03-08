@@ -12,9 +12,7 @@ const delay = ms => new Promise(r => setTimeout(r, ms));
   try {
     const githubToken = core.getInput('token');
     const namespace = core.getInput('namespace');
-    const githubRef = github.context.ref;
-    const refParts = githubRef.split('/');
-    const prNumber = refParts.length > 2 && refParts[2] || null
+    const prNumber = github.context.payload.pull_request && github.context.payload.pull_request.number
     const dockerImageHash = github.context.sha;
 
     if (!githubToken || !prNumber || !namespace) {
