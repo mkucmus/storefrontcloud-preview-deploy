@@ -17,7 +17,7 @@ const isPush = ({eventName, issue: { number }}) => {
   
   return true;
 }
-const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespace, isPush) => {
+const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespace, isPush, issue) => {
   const { data: comments } = await client.repos.listCommentsForCommit({
     ...repo,
     commit_sha: commitHash
@@ -33,7 +33,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
       body: newCommentBody
     }) || await client.issues.createComment({ // or PR
       ...repo,
-      issue_number: core.context.issue.number,
+      issue_number: issue.number,
       body: newCommentBody
     });
 
@@ -56,7 +56,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
   try {
     const githubToken = core.getInput('token');
     const namespace = core.getInput('namespace');
-    const { sha: commitHash, repo, payload } = github.context
+    const { sha: commitHash, repo, payload, issue} = github.context
 
     const prNumber = payload.pull_request && payload.pull_request.number
 
@@ -79,7 +79,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     
     console.log(`Your application is successfully deployed.`);
     const octokit = new github.GitHub(githubToken);
-    await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context));
+    await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context), issue);
   } catch (error) {
     core.setFailed(error.message);
   }
