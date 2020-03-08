@@ -10,7 +10,14 @@ const client = axios.create({
 const DEPLOY_COMMENT_TEMPLATE = ':blue_heart: NAMESPACE successfully deployed';
 const delay = ms => new Promise(r => setTimeout(r, ms));
 const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.storefrontcloud.io`
-const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespace) => {
+const isPush = ({eventName, issue: { number }}) => {
+  if (number && eventName !== 'push') {
+    return false;
+  }
+  
+  return true;
+}
+const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespace, isPush) => {
   const { data: comments } = await client.repos.listCommentsForCommit({
     ...repo,
     commit_sha: commitHash
@@ -19,17 +26,29 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
   const oldComment = comments.find(({body}) => body.startsWith(DEPLOY_COMMENT_TEMPLATE.replace('NAMESPACE', namespace)))
   const newCommentBody = `${DEPLOY_COMMENT_TEMPLATE.replace('NAMESPACE', namespace)} at ${deployUrl}`
   if (!oldComment) {
-    await client.repos.createCommitComment({
+    core.info(`deployment comment does not exist. creating new one.`)
+    isPush && await client.repos.createCommitComment({
       ...repo,
       commit_sha: commitHash,
       body: newCommentBody
+    }) || await client.issues.createComment({ // or PR
+      ...repo,
+      issue_number: core.context.issue.number,
+      body: newCommentBody
     });
-  } else {
-    await client.repos.updateCommitComment({
+
+  } else { // update existing
+    core.info(`deployment comment already exists. updating it with new deploy URL.`)
+    isPush && await client.repos.updateCommitComment({
       ...repo,
       comment_id: oldComment.id,
       body: newCommentBody
-    });
+    }) || await client.issues.updateComment({ // or PR
+      ...repo,
+      comment_id: oldComment.id,
+      body: newCommentBody
+    })
+
   }
 }
 
@@ -54,12 +73,13 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     const response = await client.get(deployUrl); // double request - temporary cloud's fix
     if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
       throw "Deploy has failed. Application returns wrong data."
-    }    
+    }
+    core.setOutput('preview_url', deployUrl);
+    core.info('Preview URL has been set.');
     
     console.log(`Your application is successfully deployed.`);
     const octokit = new github.GitHub(githubToken);
-    await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace);
-    core.setOutput('preview_url', deployUrl);
+    await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context));
   } catch (error) {
     core.setFailed(error.message);
   }
