@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
+const https = require('https');
 const client = axios.create({
   httpsAgent: new https.Agent({  
     rejectUnauthorized: false
@@ -23,7 +24,7 @@ const delay = ms => new Promise(r => setTimeout(r, ms));
     const deployUrl = `https://${dockerImageHash}.${namespace}.storefrontcloud.io`
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
     
-    await axios.get(deployUrl); // double request - temporary cloud's fix
+    await client.get(deployUrl); // double request - temporary cloud's fix
     await delay(3000) // double request - temporary cloud's fix
     const response = await client.get(deployUrl);
     if (!response.data.includes('<html data-n-head-ssr')) {
