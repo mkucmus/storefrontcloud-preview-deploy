@@ -74,12 +74,11 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
       throw "Deploy has failed. Application returns wrong data."
     }
-    core.setOutput('preview_url', deployUrl);
-    core.info('Preview URL has been set.');
     
     console.log(`Your application is successfully deployed.`);
     const octokit = new github.GitHub(githubToken);
     await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context), issue);
+    core.setOutput('preview_url', deployUrl);
   } catch (error) {
     core.setFailed(error.message);
   }
