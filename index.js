@@ -7,7 +7,6 @@ const client = axios.create({
     rejectUnauthorized: false // double request - temporary cloud's fix
   })
 });
-const DEPLOY_COMMENT_TEMPLATE = ':blue_heart: NAMESPACE successfully deployed';
 const delay = ms => new Promise(r => setTimeout(r, ms));
 const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.storefrontcloud.io`
 const isPush = ({eventName, issue: { number }}) => {
@@ -23,6 +22,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     commit_sha: commitHash
   });
   core.debug(comments);
+  const DEPLOY_COMMENT_TEMPLATE = ':blue_heart: NAMESPACE successfully deployed';
   let previousCommentBody = DEPLOY_COMMENT_TEMPLATE;
   const parsedPreviousCommentBody = previousCommentBody.replace('NAMESPACE', namespace)
   const oldComment = comments.find(({body}) => body.startsWith(parsedPreviousCommentBody))
