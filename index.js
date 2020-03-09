@@ -23,8 +23,8 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     commit_sha: commitHash
   });
   core.debug(comments);
-
-  const oldComment = comments.find(({body}) => body.startsWith(DEPLOY_COMMENT_TEMPLATE.replace('NAMESPACE', namespace)))
+  let previousCommentBody = DEPLOY_COMMENT_TEMPLATE;
+  const oldComment = comments.find(({body}) => body.startsWith(previousCommentBody.replace('NAMESPACE', namespace)))
   const newCommentBody = `${DEPLOY_COMMENT_TEMPLATE.replace('NAMESPACE', namespace)} at ${deployUrl}`
   if (!oldComment) {
     core.info(`deployment comment does not exist. creating new one.`)
