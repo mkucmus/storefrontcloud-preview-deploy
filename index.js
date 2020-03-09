@@ -22,11 +22,9 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     commit_sha: commitHash
   });
   core.debug(comments);
-  const DEPLOY_COMMENT_TEMPLATE = ':blue_heart: NAMESPACE successfully deployed';
-  let previousCommentBody = DEPLOY_COMMENT_TEMPLATE;
-  const parsedPreviousCommentBody = previousCommentBody.replace('NAMESPACE', namespace)
-  const oldComment = comments.find(({body}) => body.startsWith(parsedPreviousCommentBody))
-  const newCommentBody = `${parsedPreviousCommentBody} at ${deployUrl}`
+  const DEPLOY_COMMENT_TEMPLATE = ':blue_heart: shopware-pwa successfully deployed';
+  const oldComment = comments.find(({body}) => body.startsWith(DEPLOY_COMMENT_TEMPLATE))
+  const newCommentBody = `${DEPLOY_COMMENT_TEMPLATE} at ${deployUrl}`
   if (!oldComment) {
     core.info(`deployment comment does not exist. creating new one.`)
     isPush && await client.repos.createCommitComment({
