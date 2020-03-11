@@ -72,6 +72,8 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     // try to get the success result for 5 times
     for (i = 0; i < 5; i++) {
       const response = await axios.get(deployUrl);
+      console.log(`${i}. try to get the application deployed.`);
+      console.log('response: ', response);
       if (response.data.includes('<html data-n-head-ssr')) {
         console.log(`Your application is successfully deployed.`);
         core.setOutput('preview_url', deployUrl);
