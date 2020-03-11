@@ -2,11 +2,11 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
 const https = require('https');
-const client = axios.create({
-  httpsAgent: new https.Agent({
-    rejectUnauthorized: false // double request - temporary cloud's fix
-  })
-});
+// const client = axios.create({
+//   httpsAgent: new https.Agent({
+//     rejectUnauthorized: false // double request - temporary cloud's fix
+//   })
+// });
 const delay = ms => new Promise(r => setTimeout(r, ms));
 const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.preview.storefrontcloud.io`
 const isPush = ({eventName, issue: { number }}) => {
@@ -68,9 +68,9 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     const deployUrl = getDeployUrl(commitHash, namespace)
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
     
-    await client.get(deployUrl); // double request - temporary cloud's fix
+    await axios.get(deployUrl); // double request - temporary cloud's fix
     await delay(5000) 
-    const response = await client.get(deployUrl); // double request - temporary cloud's fix
+    const response = await axios.get(deployUrl); // double request - temporary cloud's fix
     if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
       throw "Deploy has failed. Application returns wrong data."
     }
@@ -80,6 +80,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     //await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context), issue);
     core.setOutput('preview_url', deployUrl);
   } catch (error) {
+    console.error(error);
     core.setFailed(error.message);
   }
 })()
