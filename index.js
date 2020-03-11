@@ -72,13 +72,14 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     // try to get the success result for 5 times
     for (i = 0; i < 7; i++) {
       const response = await axios.get(deployUrl);
-      console.log(`${i}. try to get the application deployed.`);
-      console.log('response: ', response.data);
+      console.log(`${i+1}. try to get the application deployed.`);
       if (response.data.includes('<html data-n-head-ssr')) {
         console.log(`Your application is successfully deployed.`);
         core.setOutput('preview_url', deployUrl);
         isSuccess = true
         break;
+      } else {
+        console.log(`Response from Storefrontcloud.io does not contain deployed data.`);
       }
       
       await delay(5000);
