@@ -84,5 +84,5 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
       await delay(5000);
     }
 
-    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 5 (15s) is reached.`);
+    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 5 (25s) is reached.`);
 })()
