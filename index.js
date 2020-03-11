@@ -53,7 +53,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
 }
 
 ;(async function() {
-  try {
+
     const githubToken = core.getInput('token');
     const namespace = core.getInput('namespace');
     const { sha: commitHash, repo, payload, issue} = github.context
@@ -67,21 +67,20 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
 
     const deployUrl = getDeployUrl(commitHash, namespace)
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
-    
-    await axios.get(deployUrl); // double request - temporary cloud's fix
-    await delay(10000) 
-    const response = await axios.get(deployUrl); // double request - temporary cloud's fix
-    console.warn(response.data);
-    if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
-      throw "Deploy has failed. Application returns wrong data."
+
+    let isSuccess = false;
+    // try to get the success result for 5 times
+    for (i = 0; i < 5; i++) {
+      const response = await axios.get(deployUrl);
+      if (response.data.includes('<html data-n-head-ssr')) {
+        console.log(`Your application is successfully deployed.`);
+        core.setOutput('preview_url', deployUrl);
+        isSuccess = true
+        break;
+      }
+      
+      await delay(3000);
     }
-    
-    console.log(`Your application is successfully deployed.`);
-    //const octokit = new github.GitHub(githubToken);
-    //await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context), issue);
-    core.setOutput('preview_url', deployUrl);
-  } catch (error) {
-    console.error(error);
-    core.setFailed(error.message);
-  }
+
+    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 5 (15s) is reached.`);
 })()
