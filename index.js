@@ -69,8 +69,9 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
     
     await axios.get(deployUrl); // double request - temporary cloud's fix
-    await delay(5000) 
+    await delay(10000) 
     const response = await axios.get(deployUrl); // double request - temporary cloud's fix
+    console.warn(response.data);
     if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
       throw "Deploy has failed. Application returns wrong data."
     }
