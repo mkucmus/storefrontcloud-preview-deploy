@@ -8,7 +8,7 @@ const client = axios.create({
   })
 });
 const delay = ms => new Promise(r => setTimeout(r, ms));
-const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.storefrontcloud.io`
+const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.preview.storefrontcloud.io`
 const isPush = ({eventName, issue: { number }}) => {
   if (number && eventName !== 'push') {
     return false;
@@ -21,7 +21,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     ...repo,
     commit_sha: commitHash
   });
-  core.debug(comments);
+  //core.debug(comments);
   const DEPLOY_COMMENT_TEMPLATE = ':blue_heart: shopware-pwa successfully deployed';
   const oldComment = comments.find(({body}) => body.startsWith(DEPLOY_COMMENT_TEMPLATE))
   const newCommentBody = `${DEPLOY_COMMENT_TEMPLATE} at ${deployUrl}`
@@ -69,15 +69,15 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
     
     await client.get(deployUrl); // double request - temporary cloud's fix
-    await delay(3000) 
+    await delay(5000) 
     const response = await client.get(deployUrl); // double request - temporary cloud's fix
     if (!response.data.includes('<html data-n-head-ssr')) { // TODO: replace with requesting the healthcheck endpoint
       throw "Deploy has failed. Application returns wrong data."
     }
     
     console.log(`Your application is successfully deployed.`);
-    const octokit = new github.GitHub(githubToken);
-    await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context), issue);
+    //const octokit = new github.GitHub(githubToken);
+    //await upsertDeployComment(octokit, repo, commitHash, deployUrl, namespace, isPush(github.context), issue);
     core.setOutput('preview_url', deployUrl);
   } catch (error) {
     core.setFailed(error.message);
