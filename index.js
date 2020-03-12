@@ -69,7 +69,7 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
 
     let isSuccess = false;
-    // try to get the success result for 5 times
+    // try to get the success result for 8 times
     for (i = 0; i < 8; i++) {
       const response = await axios.get(deployUrl);
       console.log(`.`);
@@ -85,5 +85,5 @@ const upsertDeployComment = async (client, repo, commitHash, deployUrl, namespac
       await delay(5000);
     }
 
-    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 7 (40s) is reached.`);
+    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 8 (40s) is reached.`);
 })()
