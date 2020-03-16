@@ -23,10 +23,10 @@ const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.pr
     console.log(`Starting deploying PR #${prNumber} on ${deployUrl}`);
 
     let isSuccess = false;
-    // try to get the success result for 5 times
-    for (i = 0; i < 7; i++) {
+    // try to get the success result for 8 times
+    for (i = 0; i < 8; i++) {
       const response = await axios.get(deployUrl);
-      console.log(`${i+1}. try to get the application deployed.`);
+      console.log(`.`);
       if (response.data.includes('<html data-n-head-ssr')) {
         console.log(`Your application is successfully deployed.`);
         core.setOutput('preview_url', deployUrl);
@@ -39,5 +39,5 @@ const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.pr
       await delay(5000);
     }
 
-    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 5 (35s) is reached.`);
+    isSuccess || core.setFailed(`Your application wasn't deployed or got stuck. Retries limit of 8 (40s) is reached.`);
 })()
