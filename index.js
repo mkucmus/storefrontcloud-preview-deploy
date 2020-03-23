@@ -33,7 +33,7 @@ const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.pr
         isSuccess = true
         break;
       } else {
-        console.log(`Response from Storefrontcloud.io does not contain deployed data.`);
+        console.log(`.`);
       }
       
       await delay(5000);
