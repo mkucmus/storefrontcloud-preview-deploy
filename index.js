@@ -27,13 +27,17 @@ const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.pr
     for (i = 0; i < 8; i++) {
       const response = await axios.get(deployUrl);
       console.log(`.`);
-      if (response.data.includes('<html data-n-head-ssr')) {
-        console.log(`Your application is successfully deployed.`);
-        core.setOutput('preview_url', deployUrl);
-        isSuccess = true
-        break;
-      } else {
-        console.log(`.`);
+      try {
+          if (response.data.includes('<html data-n-head-ssr')) {
+            console.log(`Your application is successfully deployed.`);
+            core.setOutput('preview_url', deployUrl);
+            isSuccess = true
+            break;
+          } else {
+            console.log(`.`);
+          }
+      } catch (e) {
+        console.log('e');
       }
       
       await delay(5000);
