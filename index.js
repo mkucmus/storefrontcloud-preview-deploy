@@ -25,9 +25,10 @@ const getDeployUrl = (version, namespace) => `https://${version}.${namespace}.pr
     let isSuccess = false;
     // try to get the success result for 8 times
     for (i = 0; i < 8; i++) {
-      const response = await axios.get(deployUrl);
-      console.log(`.`);
+      
       try {
+          const response = await axios.get(deployUrl);
+          console.log(`.`);
           if (response.data.includes('<html data-n-head-ssr')) {
             console.log(`Your application is successfully deployed.`);
             core.setOutput('preview_url', deployUrl);
